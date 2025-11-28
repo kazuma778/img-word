@@ -1280,6 +1280,15 @@ def extract_grayscale_start():
 
     return task_id
 
+@app.route('/processing-progress/<task_id>')
+def processing_progress(task_id):
+    task = get_task(task_id)
+    if task:
+        if task['status'] == 'completed':
+            task['download_url'] = url_for('download_converted_file', filename=task['download_filename'])
+        return jsonify(task)
+    return jsonify({'status': 'not_found'}), 404
+
 @app.route('/document-edit', methods=['GET', 'POST'])
 def document_edit():
     if request.method == 'POST':
