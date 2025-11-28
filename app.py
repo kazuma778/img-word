@@ -180,8 +180,14 @@ app = Flask(__name__)
 app.secret_key = str(uuid.uuid4())
 
 # Configuration
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['PROCESSED_FOLDER'] = 'processed'
+if os.name == 'nt':
+    # Windows (Local Development)
+    app.config['UPLOAD_FOLDER'] = 'uploads'
+    app.config['PROCESSED_FOLDER'] = 'processed'
+else:
+    # Linux (Vercel/Production) - Use /tmp for writable storage
+    app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
+    app.config['PROCESSED_FOLDER'] = '/tmp/processed'
 app.config['MAX_FILES'] = 5  # Maksimal 5 file di processed
 app.config['MAX_UPLOAD_FILES'] = 500  # Maksimal 5 file di uploads
 app.config['ALLOWED_EXTENSIONS'] = {'docx', 'pdf', 'doc', 'jpg', 'jpeg', 'png', 'rtf'}  # Tambah RTF
