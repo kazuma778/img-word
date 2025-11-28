@@ -27,6 +27,7 @@ from docxcompose.composer import Composer
 from docx import Document as DocxDocument
 from markupsafe import Markup
 import re, os
+import json
 import requests # Added for image upscaling
 import logging
 
@@ -192,8 +193,44 @@ app.config['MAX_FILES'] = 5  # Maksimal 5 file di processed
 app.config['MAX_UPLOAD_FILES'] = 500  # Maksimal 5 file di uploads
 app.config['ALLOWED_EXTENSIONS'] = {'docx', 'pdf', 'doc', 'jpg', 'jpeg', 'png', 'rtf'}  # Tambah RTF
 
-# Dictionary to store task progress
-tasks = {}
+# Dictionary to store task progress (REMOVED - Replaced by File-Based Storage)
+# tasks = {}
+
+# Task Storage Configuration
+if os.name == 'nt':
+    TASKS_DIR = os.path.join(os.getcwd(), 'processed', 'tasks')
+else:
+    TASKS_DIR = os.path.join('/tmp', 'processed', 'tasks')
+
+os.makedirs(TASKS_DIR, exist_ok=True)
+
+def save_task(task_id, data):
+    """Save task status to JSON file"""
+    try:
+        file_path = os.path.join(TASKS_DIR, f"{task_id}.json")
+        with open(file_path, 'w') as f:
+            json.dump(data, f)
+    except Exception as e:
+        print(f"Error saving task {task_id}: {e}")
+
+def get_task(task_id):
+    """Get task status from JSON file"""
+    try:
+        file_path = os.path.join(TASKS_DIR, f"{task_id}.json")
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        return None
+    except Exception as e:
+        print(f"Error reading task {task_id}: {e}")
+        return None
+
+def update_task(task_id, **kwargs):
+    """Update specific fields in task"""
+    data = get_task(task_id)
+    if data:
+        data.update(kwargs)
+        save_task(task_id, data)
 
 # Create necessary directories
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -289,9 +326,25 @@ def cleanup_uploads_folder():
         print(f"Error pada saat pembersihan folder uploads: {e}")
 
 def cleanup_all_folders():
-    """Bersihkan kedua folder sekaligus"""
+    """Bersihkan semua folder sementara"""
     cleanup_uploads_folder()
     cleanup_processed_folder()
+    cleanup_tasks_folder()
+
+def cleanup_tasks_folder():
+    """Hapus file task lama (> 1 jam)"""
+    try:
+        current_time = time.time()
+        for filename in os.listdir(TASKS_DIR):
+            file_path = os.path.join(TASKS_DIR, filename)
+            # Hapus jika lebih dari 1 jam
+            if os.path.getmtime(file_path) < current_time - 3600:
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Gagal menghapus task lama {filename}: {e}")
+    except Exception as e:
+        print(f"Error cleanup tasks: {e}")
 
 def periodic_cleanup():
     """Cleanup berkala setiap 30 menit"""
@@ -682,26 +735,18 @@ def safe_remove_file(file_path, retry=3, delay=0.5):
 
 def update_task_progress(task_id, progress, message=None):
     """Update progress for a specific task"""
-    if task_id in tasks:
-        tasks[task_id]['progress'] = min(progress, 99)
-        if message:
-            tasks[task_id]['message'] = message
-        print(f"Task {task_id}: {progress:.1f}% - {message}")
+    update_task(task_id, progress=min(progress, 99), message=message)
+    print(f"Task {task_id}: {progress:.1f}% - {message}")
 
 def complete_task(task_id, filename):
     """Mark a task as completed"""
-    if task_id in tasks:
-        tasks[task_id]['status'] = 'completed'
-        tasks[task_id]['progress'] = 100
-        tasks[task_id]['download_filename'] = filename
-        print(f"Task {task_id} completed: {filename}")
+    update_task(task_id, status='completed', progress=100, download_filename=filename)
+    print(f"Task {task_id} completed: {filename}")
 
 def fail_task(task_id, error_message):
     """Mark a task as failed"""
-    if task_id in tasks:
-        tasks[task_id]['status'] = 'failed'
-        tasks[task_id]['message'] = error_message
-        print(f"Task {task_id} failed: {error_message}")
+    update_task(task_id, status='failed', message=error_message)
+    print(f"Task {task_id} failed: {error_message}")
 
 def process_extraction(files_data, task_id):
     """Process files extraction with proper sequential ordering and consistent naming - UPDATED for RTF support"""
@@ -846,8 +891,8 @@ def process_grayscale_conversion(files_data, task_id):
                 with open(temp_file_path, 'wb') as f:
                     f.write(file_content)
 
-                update_task_progress(task_id, (file_index / total_files) * 30,
-                                   f"Processing file {file_index+1}/{total_files}: {safe_filename}")
+                update_task(task_id, progress=(file_index / total_files) * 30,
+                                   message=f"Processing file {file_index+1}/{total_files}: {safe_filename}")
 
                 # Standardize format with sequential counter
                 standardized_path, standardized_name = standardize_image_format(
@@ -1167,12 +1212,12 @@ def extract_start():
         return "No files selected", 400
 
     task_id = str(uuid.uuid4())
-    tasks[task_id] = {
+    save_task(task_id, {
         'status': 'processing',
         'progress': 0,
         'message': 'Starting extraction...',
         'download_filename': None
-    }
+    })
 
     files_data = []
     for file in files:
@@ -1192,12 +1237,12 @@ def convert_start():
         return "No files selected", 400
 
     task_id = str(uuid.uuid4())
-    tasks[task_id] = {
+    save_task(task_id, {
         'status': 'processing',
         'progress': 0,
         'message': 'Starting grayscale conversion...',
         'download_filename': None
-    }
+    })
 
     files_data = []
     for file in files:
@@ -1217,12 +1262,12 @@ def extract_grayscale_start():
         return "No files selected", 400
 
     task_id = str(uuid.uuid4())
-    tasks[task_id] = {
+    save_task(task_id, {
         'status': 'processing',
         'progress': 0,
         'message': 'Starting extraction and grayscale conversion...',
         'download_filename': None
-    }
+    })
 
     files_data = []
     for file in files:
@@ -1318,24 +1363,6 @@ def document_edit():
             return render_template('document_edit.html', processed=True, filenames=processed_files)
         else:
             return redirect(request.url)
-
-    return render_template('document_edit.html', processed=False)
-
-@app.route('/processing-progress/<task_id>')
-def processing_progress(task_id):
-    if task_id in tasks:
-        task_data = tasks[task_id].copy()
-        if task_data['status'] == 'completed' and task_data.get('download_filename'):
-            task_data['download_url'] = url_for('download_file', filename=task_data['download_filename'])
-        return jsonify(task_data)
-    else:
-        return jsonify({
-            'status': 'failed',
-            'message': 'Task not found'
-        }), 404
-
-@app.route('/download/<filename>')
-def download_file(filename):
     @after_this_request
     def remove_file(response):
         try:
