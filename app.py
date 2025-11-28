@@ -396,7 +396,7 @@ def extract_images_from_pdf_sequential(pdf_path, temp_dir, task_id=None, file_in
 
         # Kumpulkan semua gambar dari semua halaman dengan informasi urutan
         for page_num in range(total_pages):
-            if task_id:
+            if task_id and (page_num % 5 == 0 or page_num == total_pages - 1):
                 progress = 20 + (file_index * 30 / total_files) + ((page_num / total_pages) * 15 / total_files)
                 update_task_progress(task_id, progress, f"Scanning PDF {file_index+1}/{total_files}: page {page_num+1}/{total_pages}")
 
@@ -439,7 +439,7 @@ def extract_images_from_pdf_sequential(pdf_path, temp_dir, task_id=None, file_in
         total_images = len(all_images_data)
         
         for sequential_index, img_data in enumerate(all_images_data):
-            if task_id:
+            if task_id and (sequential_index % 10 == 0 or sequential_index == total_images - 1):
                 progress = 35 + (file_index * 30 / total_files) + ((sequential_index / total_images) * 15 / total_files)
                 update_task_progress(task_id, progress, f"Extracting image {sequential_index+1}/{total_images} from PDF {file_index+1}/{total_files}")
 
@@ -524,7 +524,7 @@ def extract_images_from_docx_sequential(file_path, output_dir, task_id=None, fil
         total_images = len(image_relations_with_order)
         
         for sequential_index, img_data in enumerate(image_relations_with_order):
-            if task_id:
+            if task_id and (sequential_index % 10 == 0 or sequential_index == total_images - 1):
                 progress = 20 + (file_index * 30 / total_files) + ((sequential_index / total_images) * 30 / total_files)
                 update_task_progress(task_id, progress, f"Extracting image {sequential_index+1}/{total_images} from document {file_index+1}/{total_files}")
 
@@ -579,7 +579,7 @@ def convert_images_to_grayscale_ordered(images_data, task_id=None, progress_star
     
     for i, (image_path, original_name, counter) in enumerate(images_data):
         try:
-            if task_id:
+            if task_id and (i % 10 == 0 or i == total_images - 1):
                 progress = progress_start + (i / total_images) * progress_range
                 update_task_progress(task_id, progress, f"Converting image {i+1}/{total_images} to grayscale")
 
