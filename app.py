@@ -5,8 +5,12 @@ from docx import Document
 from PIL import Image
 import tempfile
 import shutil
-import pythoncom
-import win32com.client as win32
+try:
+    import pythoncom
+    import win32com.client as win32
+except ImportError:
+    pythoncom = None
+    win32 = None
 import fitz  # PyMuPDF
 import uuid
 from werkzeug.utils import secure_filename
@@ -546,6 +550,10 @@ def convert_images_to_grayscale_ordered(images_data, task_id=None, progress_star
 
 def doc_to_docx(doc_path):
     """Konversi DOC ke DOCX dengan penanganan error yang lebih baik - FIXED"""
+    if pythoncom is None or win32 is None:
+        print("Windows COM libraries not available. Skipping DOC conversion.")
+        return None
+
     pythoncom.CoInitialize()
     word = None
     try:
@@ -599,6 +607,10 @@ def doc_to_docx(doc_path):
 
 def rtf_to_docx(rtf_path):
     """Konversi RTF ke DOCX dengan penanganan error yang lebih baik - FIXED"""
+    if pythoncom is None or win32 is None:
+        print("Windows COM libraries not available. Skipping RTF conversion.")
+        return None
+
     pythoncom.CoInitialize()
     word = None
     try:
@@ -1075,6 +1087,9 @@ def sanitize_filename(name):
 def to_docx(path):
     ext = os.path.splitext(path)[1].lower()
     if ext in ('.doc', '.rtf'):
+        if pythoncom is None or win32 is None:
+            return path # Return original path if conversion not possible
+            
         pythoncom.CoInitialize()
         word = win32.gencache.EnsureDispatch('Word.Application')
         word.Visible = False; word.DisplayAlerts = False
