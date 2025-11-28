@@ -15,7 +15,8 @@
             {% for file in converted_files %}
             <li class="file-item">
                 <span>🖼️ {{ file }}</span>
-                <a href="{{ url_for('download_converted_file', filename=file) }}" class="btn btn-secondary">Download</a>
+                <a href="{{ url_for('download_result_file', task_id=task_id, filename=file) }}"
+                    class="btn btn-secondary">Download</a>
             </li>
             {% endfor %}
         </ul>

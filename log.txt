@@ -1,17 +1,2 @@
-2025-11-28 13:36:33,184 [WARNING] werkzeug -  * Debugger is active!
-2025-11-28 13:36:33,191 [INFO] werkzeug -  * Debugger PIN: 410-663-914
-2025-11-28 13:36:36,809 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:36] "GET / HTTP/1.1" 200 -
-2025-11-28 13:36:37,512 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:37] "[36mGET /static/js/file-manager.js HTTP/1.1[0m" 304 -
-2025-11-28 13:36:37,515 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:37] "[36mGET /static/css/jobie-dashboard.css HTTP/1.1[0m" 304 -
-2025-11-28 13:36:37,517 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:37] "[36mGET /static/js/jobie-dashboard.js HTTP/1.1[0m" 304 -
-2025-11-28 13:36:37,523 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:37] "[36mGET /static/css/file-manager.css HTTP/1.1[0m" 304 -
-2025-11-28 13:36:43,826 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:43] "POST /extract-start HTTP/1.1" 200 -
-2025-11-28 13:36:44,845 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:44] "GET /processing-progress/3debb4d6-614a-4a5a-a1e6-3845fca2d38c HTTP/1.1" 200 -
-2025-11-28 13:36:45,885 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:45] "GET /processing-progress/3debb4d6-614a-4a5a-a1e6-3845fca2d38c HTTP/1.1" 200 -
-2025-11-28 13:36:46,863 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:46] "GET /processing-progress/3debb4d6-614a-4a5a-a1e6-3845fca2d38c HTTP/1.1" 200 -
-2025-11-28 13:36:47,857 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:47] "GET /processing-progress/3debb4d6-614a-4a5a-a1e6-3845fca2d38c HTTP/1.1" 200 -
-2025-11-28 13:36:48,856 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:48] "GET /processing-progress/3debb4d6-614a-4a5a-a1e6-3845fca2d38c HTTP/1.1" 200 -
-2025-11-28 13:36:49,852 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:49] "GET /processing-progress/3debb4d6-614a-4a5a-a1e6-3845fca2d38c HTTP/1.1" 200 -
-2025-11-28 13:36:50,879 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:50] "GET /processing-progress/3debb4d6-614a-4a5a-a1e6-3845fca2d38c HTTP/1.1" 200 -
-2025-11-28 13:36:52,632 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:52] "GET /download/BUKU_FCNA_JILID_3_images.zip HTTP/1.1" 200 -
-2025-11-28 13:36:53,189 [INFO] werkzeug - 127.0.0.1 - - [28/Nov/2025 13:36:53] "[35m[1mGET /download/BUKU_FCNA_JILID_3_images.zip HTTP/1.1[0m" 206 -
+2025-11-28 17:07:10,093 [WARNING] werkzeug -  * Debugger is active!
+2025-11-28 17:07:10,096 [INFO] werkzeug -  * Debugger PIN: 410-663-914

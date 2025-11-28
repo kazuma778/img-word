@@ -181,27 +181,16 @@ app = Flask(__name__)
 app.secret_key = str(uuid.uuid4())
 
 # Configuration
-if os.name == 'nt':
-    # Windows (Local Development)
-    app.config['UPLOAD_FOLDER'] = 'uploads'
-    app.config['PROCESSED_FOLDER'] = 'processed'
-else:
-    # Linux (Vercel/Production) - Use /tmp for writable storage
-    app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
-    app.config['PROCESSED_FOLDER'] = '/tmp/processed'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
+app.config['PROCESSED_FOLDER'] = os.path.join(BASE_DIR, 'processed')
+
 app.config['MAX_FILES'] = 5  # Maksimal 5 file di processed
 app.config['MAX_UPLOAD_FILES'] = 500  # Maksimal 5 file di uploads
 app.config['ALLOWED_EXTENSIONS'] = {'docx', 'pdf', 'doc', 'jpg', 'jpeg', 'png', 'rtf'}  # Tambah RTF
 
-# Dictionary to store task progress (REMOVED - Replaced by File-Based Storage)
-# tasks = {}
-
 # Task Storage Configuration
-if os.name == 'nt':
-    TASKS_DIR = os.path.join(os.getcwd(), 'processed', 'tasks')
-else:
-    TASKS_DIR = os.path.join('/tmp', 'processed', 'tasks')
-
+TASKS_DIR = os.path.join(app.config['PROCESSED_FOLDER'], 'tasks')
 os.makedirs(TASKS_DIR, exist_ok=True)
 
 def save_task(task_id, data):
@@ -332,17 +321,39 @@ def cleanup_all_folders():
     cleanup_tasks_folder()
 
 def cleanup_tasks_folder():
-    """Hapus file task lama (> 1 jam)"""
+    """Hapus file task lama (> 1 jam) dan folder hasil task lama (> 24 jam)"""
     try:
         current_time = time.time()
+        
+        # Cleanup task JSON files (> 1 jam)
         for filename in os.listdir(TASKS_DIR):
             file_path = os.path.join(TASKS_DIR, filename)
-            # Hapus jika lebih dari 1 jam
-            if os.path.getmtime(file_path) < current_time - 3600:
-                try:
-                    os.remove(file_path)
-                except Exception as e:
-                    print(f"Gagal menghapus task lama {filename}: {e}")
+            if os.path.isfile(file_path):
+                # Hapus jika lebih dari 1 jam
+                if os.path.getmtime(file_path) < current_time - 3600:
+                    try:
+                        os.remove(file_path)
+                        print(f"Cleanup: Menghapus task JSON lama {filename}")
+                    except Exception as e:
+                        print(f"Gagal menghapus task lama {filename}: {e}")
+        
+        # Cleanup task result folders di processed/<task_id>/ (> 24 jam)
+        processed_folder = app.config['PROCESSED_FOLDER']
+        for item_name in os.listdir(processed_folder):
+            item_path = os.path.join(processed_folder, item_name)
+            # Skip jika bukan folder atau adalah folder khusus (tasks, dll)
+            if not os.path.isdir(item_path) or item_name == 'tasks':
+                continue
+            
+            # Cek apakah ini folder task (UUID format biasanya)
+            # Hapus jika lebih dari 24 jam (86400 detik)
+            try:
+                if os.path.getmtime(item_path) < current_time - 86400:
+                    shutil.rmtree(item_path)
+                    print(f"Cleanup: Menghapus folder task lama {item_name}")
+            except Exception as e:
+                print(f"Gagal menghapus folder task {item_name}: {e}")
+                
     except Exception as e:
         print(f"Error cleanup tasks: {e}")
 
@@ -874,7 +885,11 @@ def process_grayscale_conversion(files_data, task_id):
     """Process grayscale conversion with proper ordering"""
     try:
         unique_zip = f"{uuid.uuid4()}_grayscale_images.zip"
-        master_zip = os.path.join(app.config['PROCESSED_FOLDER'], unique_zip)
+        # Buat folder khusus untuk task ini
+        task_folder = os.path.join(app.config['PROCESSED_FOLDER'], task_id)
+        os.makedirs(task_folder, exist_ok=True)
+        
+        master_zip = os.path.join(task_folder, unique_zip)
 
         with tempfile.TemporaryDirectory() as temp_dir:
             has_images = False
@@ -914,8 +929,16 @@ def process_grayscale_conversion(files_data, task_id):
 
                     # Sort by counter before adding to ZIP
                     grayscale_images.sort(key=lambda x: x[2])
+                    
+                    # Pindahkan file grayscale ke folder task
+                    final_grayscale_images = []
+                    for img_path, img_name, _ in grayscale_images:
+                        dest_path = os.path.join(task_folder, img_name)
+                        shutil.move(img_path, dest_path)
+                        final_grayscale_images.append((dest_path, img_name))
+
                     with zipfile.ZipFile(master_zip, 'w') as zipf:
-                        for img_path, img_name, _ in grayscale_images:
+                        for img_path, img_name in final_grayscale_images:
                             if os.path.exists(img_path):
                                 zipf.write(img_path, img_name)
 
@@ -1372,18 +1395,7 @@ def document_edit():
             return render_template('document_edit.html', processed=True, filenames=processed_files)
         else:
             return redirect(request.url)
-    @after_this_request
-    def remove_file(response):
-        try:
-            file_path = os.path.join(app.config['PROCESSED_FOLDER'], filename)
-            time.sleep(0.5)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-        except Exception as e:
-            print(f"Gagal menghapus file: {e}")
-        return response
-
-    return send_from_directory(app.config['PROCESSED_FOLDER'], filename, as_attachment=True)
+    return render_template('document_edit.html')
 
 @app.route('/download-doc/<filename>')
 def download_doc(filename):
@@ -1790,12 +1802,50 @@ def converter_results():
 
 @app.route('/download-converted/<filename>')
 def download_converted_file(filename):
+    # Cek apakah file ada langsung di PROCESSED_FOLDER (untuk async tasks)
+    if os.path.exists(os.path.join(app.config['PROCESSED_FOLDER'], filename)):
+        return send_from_directory(app.config['PROCESSED_FOLDER'], filename, as_attachment=True)
+
+    # Fallback ke session folder (untuk batch converter)
     session_folder_id = session.get('session_folder_id')
-    if not session_folder_id:
-        abort(404)
+    if session_folder_id:
+        session_folder = os.path.join(app.config['PROCESSED_FOLDER'], session_folder_id)
+        if os.path.exists(os.path.join(session_folder, filename)):
+            return send_from_directory(session_folder, filename, as_attachment=True)
+            
+    abort(404)
+
+@app.route('/download-result/<task_id>/<filename>')
+def download_result_file(task_id, filename):
+    directory = os.path.join(app.config['PROCESSED_FOLDER'], task_id)
+    return send_from_directory(directory, filename, as_attachment=True)
+
+@app.route('/grayscale-results/<task_id>')
+def grayscale_results(task_id):
+    task = get_task(task_id)
+    if not task or task['status'] != 'completed':
+        flash('Task not found or not completed', 'error')
+        return redirect(url_for('index'))
     
-    session_folder = os.path.join(app.config['PROCESSED_FOLDER'], session_folder_id)
-    return send_from_directory(session_folder, filename, as_attachment=True)
+    # Folder task
+    task_dir = os.path.join(app.config['PROCESSED_FOLDER'], task_id)
+    
+    # List image files
+    image_files = []
+    if os.path.exists(task_dir):
+        image_files = [f for f in os.listdir(task_dir) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+        image_files.sort()
+    
+    zip_filename = task['download_filename']
+    # ZIP ada di dalam folder task juga
+    zip_url = url_for('download_result_file', task_id=task_id, filename=zip_filename)
+    
+    return render_template('converter_result.html', 
+                         converted_files=image_files, 
+                         task_id=task_id,
+                         zip_url=zip_url,
+                         back_url=url_for('index'),
+                         back_text="Kembali ke Beranda")
 
 @app.route('/download-zip')
 def download_zip():
