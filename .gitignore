@@ -8,7 +8,7 @@ files/
 static/temp_uploads/
 *.log
 backup/
-error.txt
+
 mod.txt
 .DS_Store
 Thumbs.db

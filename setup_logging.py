@@ -16,15 +16,19 @@ def setup_file_logging():
         logging.root.removeHandler(handler)
     
     # Configure logging with both console and file handlers
+    handlers = [logging.StreamHandler()]
+    
+    try:
+        # File handler - mode 'w' clears file on each startup
+        handlers.append(logging.FileHandler(log_file, mode='w', encoding='utf-8'))
+    except OSError:
+        # Fallback for read-only file systems (like Vercel)
+        pass
+
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s [%(levelname)s] %(name)s - %(message)s',
-        handlers=[
-            # Console handler
-            logging.StreamHandler(),
-            # File handler - mode 'w' clears file on each startup
-            logging.FileHandler(log_file, mode='w', encoding='utf-8')
-        ]
+        handlers=handlers
     )
     
     # Return logger for app to use
