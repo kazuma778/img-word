@@ -1,0 +1,9 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/printmat/virtualenv/e/files
+    - /bin/cp -R * $DEPLOYPATH
+    - /bin/cp .env $DEPLOYPATH
+    # Optional: Install dependencies automatically (uncomment if needed)
+    # - source /home/username/virtualenv/e/files/3.12/bin/activate && pip install -r $DEPLOYPATH/requirements.txt
+    # - /usr/bin/touch $DEPLOYPATH/passenger_wsgi.py  # Restart app
