@@ -1,0 +1,147 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Konversi Grayscale{% endblock %}
+
+{% block page_title %}Konversi Grayscale{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Konversi Gambar ke Grayscale</h3>
+        <p class="card-subtitle">Ubah gambar berwarna menjadi hitam putih (.jpg, .jpeg, .png).</p>
+    </div>
+    <div class="card-body">
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flash-message error">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <form id="grayscaleForm">
+            <div class="form-group">
+                <label for="imageInput">Pilih File Gambar:</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="imageInput" name="images" class="file-input" multiple
+                        accept=".jpg,.jpeg,.png">
+                    <div class="file-input-display">
+                        <span class="file-input-icon">🖼️</span>
+                        <span class="file-input-text">Klik atau drag & drop gambar di sini</span>
+                    </div>
+                </div>
+                <div class="file-list" id="fileList" style="display: none;"></div>
+            </div>
+
+            <button type="submit" class="btn btn-full" id="submitBtn">
+                <span class="btn-text">🔄 Konversi ke Grayscale</span>
+            </button>
+        </form>
+
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-text" id="progressText">Mengkonversi...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-message" id="progressMessage">Mempersiapkan...</div>
+        </div>
+
+        <div class="download-section" id="downloadSection" style="display: none;">
+            <h3>✅ Konversi Berhasil!</h3>
+            <p>Gambar grayscale telah siap diunduh.</p>
+            <a href="#" id="downloadBtn" class="btn btn-secondary">💾 Download ZIP</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file-manager.css') }}">
+<script src="{{ url_for('static', filename='js/file-manager.js') }}"></script>
+<script>
+    const form = document.getElementById('grayscaleForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const downloadSection = document.getElementById('downloadSection');
+
+    // Initialize FileManager
+    const fileManager = new FileManager('imageInput', 'fileList', 'file-input-display');
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const files = fileManager.getFiles();
+        if (files.length === 0) {
+            alert('Pilih gambar terlebih dahulu!');
+            return;
+        }
+
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append('images', file);
+        });
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Mengkonversi...';
+        progressContainer.style.display = 'block';
+        downloadSection.style.display = 'none';
+
+        try {
+            const response = await fetch('/convert-start', {
+                method: 'POST',
+                body: formData
+            });
+
+            const taskId = await response.text();
+            trackProgress(taskId);
+        } catch (error) {
+            console.error('Error:', error);
+            resetForm();
+            alert('Terjadi kesalahan saat mengkonversi gambar.');
+        }
+    });
+
+    function trackProgress(taskId) {
+        const interval = setInterval(async () => {
+            try {
+                const response = await fetch(`/processing-progress/${taskId}`);
+                const data = await response.json();
+
+                document.getElementById('progressFill').style.width = data.progress + '%';
+                document.getElementById('progressText').textContent = `Progress: ${Math.round(data.progress)}%`;
+                document.getElementById('progressMessage').textContent = data.message || 'Mengkonversi...';
+
+                if (data.status === 'completed') {
+                    clearInterval(interval);
+                    // Redirect to results page
+                    window.location.href = `/grayscale-results/${taskId}`;
+                } else if (data.status === 'failed') {
+                    clearInterval(interval);
+                    alert('Konversi gagal: ' + data.message);
+                    resetForm();
+                }
+            } catch (error) {
+                clearInterval(interval);
+                console.error('Error tracking progress:', error);
+                resetForm();
+            }
+        }, 1000);
+    }
+
+    function showDownload(downloadUrl) {
+        progressContainer.style.display = 'none';
+        downloadSection.style.display = 'block';
+        document.getElementById('downloadBtn').href = downloadUrl;
+        resetForm();
+    }
+
+    function resetForm() {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-text">🔄 Konversi ke Grayscale</span>';
+        // Do not hide progress container
+    }
+</script>
+{% endblock %}

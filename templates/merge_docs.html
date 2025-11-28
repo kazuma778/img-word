@@ -1,0 +1,95 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Gabung Dokumen{% endblock %}
+
+{% block page_title %}Gabung Dokumen{% endblock %}
+
+{% block content %}
+
+<div class="flash-messages">
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  {% for msg in messages %}
+  <div class="card flash-card">
+    {{ msg|safe }}
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+</div>
+
+<div class="responsive-grid">
+  <div class="grid-item-main">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Gabungkan Dokumen DOC/DOCX/RTF</h3>
+        <p class="card-subtitle">Upload beberapa file untuk digabung menjadi satu file .docx.</p>
+      </div>
+      <div class="card-body">
+        <form method="POST" enctype="multipart/form-data" id="mergeForm">
+          <div class="form-group">
+            <label for="fileInput">Pilih file DOC/DOCX/RTF:</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="fileInput" name="file" class="file-input" multiple accept=".doc,.docx,.rtf">
+              <div class="file-input-display">
+                <span class="file-input-icon">📄</span>
+                <span class="file-input-text">Klik atau drag & drop file di sini</span>
+              </div>
+            </div>
+            <div class="file-list" id="fileList" style="display:none;"></div>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="changeFont" name="change_font" class="styled-checkbox">
+            <label for="changeFont">Ubah font hasil gabungan ke Times New Roman 12pt</label>
+          </div>
+
+          <button type="submit" class="btn btn-full" id="submitBtn">
+            <span class="btn-text">🔗 Merge Dokumen</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="grid-item-side">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">💡 Cara Pakai</h3>
+      </div>
+      <div class="card-body">
+        <ul class="info-list">
+          <li>Upload file .doc, .docx, atau .rtf.</li>
+          <li>Urutan file yang digabung sesuai urutan upload.</li>
+          <li>Konversi ke .docx terjadi otomatis.</li>
+          <li>Setelah klik Merge, tunggu link download muncul di atas.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file-manager.css') }}">
+<script src="{{ url_for('static', filename='js/file-manager.js') }}"></script>
+<script>
+  const form = document.getElementById('mergeForm');
+  const submitBtn = document.getElementById('submitBtn');
+
+  // Initialize FileManager
+  const fileManager = new FileManager('fileInput', 'fileList', 'file-input-display');
+
+  // Loader saat submit
+  form.addEventListener('submit', e => {
+    const files = fileManager.getFiles();
+    if (files.length === 0) {
+      e.preventDefault();
+      alert('Pilih minimal satu file!');
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Menggabungkan...';
+  });
+</script>
+{% endblock %}

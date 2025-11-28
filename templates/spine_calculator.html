@@ -1,0 +1,196 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Kalkulator Punggung Buku{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div>
+        <h1 class="page-title">Kalkulator Punggung Buku</h1>
+        <p class="page-subtitle">Hitung ketebalan punggung buku dengan mudah</p>
+    </div>
+</div>
+
+<div class="row-container" style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start;">
+    <!-- Left Column: Form -->
+    <div class="card" style="flex: 2; min-width: 300px;">
+        <div class="card-body">
+            <form id="spineForm">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="paperType" style="display: block; margin-bottom: 8px; font-weight: 500;">Jenis
+                        Kertas</label>
+                    <select id="paperType" class="form-control"
+                        style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem;">
+                        <option value="hvs">HVS (Uncoated)</option>
+                        <option value="bookpaper" selected>Book Paper (Cream)</option>
+                        <option value="artpaper">Art Paper (Glossy)</option>
+                        <option value="mattepaper">Matte Paper (Doff)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="paperWeight" style="display: block; margin-bottom: 8px; font-weight: 500;">Berat Kertas
+                        (gsm)</label>
+                    <select id="paperWeight" class="form-control"
+                        style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem;">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="coverType" style="display: block; margin-bottom: 8px; font-weight: 500;">Jenis
+                        Cover</label>
+                    <select id="coverType" class="form-control"
+                        style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem;">
+                        <option value="softcover" selected>Soft Cover</option>
+                        <option value="hardcover">Hard Cover (+2.5mm)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label for="pageCount" style="display: block; margin-bottom: 8px; font-weight: 500;">Jumlah
+                        Halaman</label>
+                    <input type="number" id="pageCount" min="1" placeholder="Masukkan jumlah halaman"
+                        class="form-control"
+                        style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem;">
+                </div>
+
+                <button type="button" onclick="calculateSpine()" class="btn-primary"
+                    style="width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--primary-color); color: white; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-calculator"></i> Hitung Punggung Buku
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Result -->
+    <div class="card" style="flex: 1; min-width: 300px; position: sticky; top: 20px;">
+        <div class="card-body"
+            style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center;">
+            <div id="resultContainer" style="display: none; width: 100%;">
+                <div style="margin-bottom: 20px; color: var(--text-secondary);">
+                    <i class="fa-solid fa-book-open" style="font-size: 3rem; opacity: 0.5;"></i>
+                </div>
+                <h3
+                    style="margin-bottom: 15px; font-size: 1.1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">
+                    Estimasi Lebar Punggung</h3>
+
+                <div
+                    style="background: var(--bg-color); padding: 30px; border-radius: 16px; border: 2px dashed var(--border-color); margin-bottom: 20px;">
+                    <div style="font-size: 4rem; font-weight: 800; color: var(--primary-color); line-height: 1;">
+                        <span id="resultValue">0</span>
+                    </div>
+                </div>
+
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+                    Berdasarkan perhitungan volume kertas standar.
+                </p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" style="text-align: center; color: var(--text-secondary);">
+                <i class="fa-solid fa-arrow-left" style="font-size: 2rem; margin-bottom: 15px; display: block;"></i>
+                <p>Masukkan detail dan klik hitung untuk melihat hasil di sini.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Nilai Volume Kertas dari Mahameru
+    const paperVolumes = {
+        'hvs': 12.5,      // Uncoated / HVS
+        'bookpaper': 18,  // Book paper
+        'artpaper': 8,    // Coated / Artpaper
+        'mattepaper': 9   // Matte / Artpaper
+    };
+
+    // Unified GSM options for all paper types
+    const commonWeights = [60, 70, 75, 80, 85, 100, 120, 150, 190, 210];
+
+    const paperTypeSelect = document.getElementById('paperType');
+    const paperWeightSelect = document.getElementById('paperWeight');
+
+    function updateWeightOptions() {
+        // Clear existing options
+        paperWeightSelect.innerHTML = '';
+
+        // Populate with common weights
+        commonWeights.forEach(w => {
+            const option = document.createElement('option');
+            option.value = w;
+            option.textContent = w + ' gsm';
+            if (w === 70) {
+                option.selected = true;
+            }
+            paperWeightSelect.appendChild(option);
+        });
+    }
+
+    // Initialize weights
+    updateWeightOptions();
+
+    function calculateSpine() {
+        const type = paperTypeSelect.value;
+        const gsm = parseInt(paperWeightSelect.value);
+        const pages = parseInt(document.getElementById('pageCount').value);
+        const coverType = document.getElementById('coverType').value;
+
+        if (!pages || pages <= 0) {
+            alert('Mohon masukkan jumlah halaman yang valid');
+            return;
+        }
+
+        // Ambil volume kertas
+        const volume = paperVolumes[type];
+
+        // Rumus Mahameru: (GSM * Volume * Pages) / 20000
+        let spine = (gsm * volume * pages) / 20000;
+
+        // Tambahan Cover (Values from Mahameru source: Soft=1, Hard=6)
+        if (coverType === 'hardcover') {
+            spine += 6;
+        } else {
+            spine += 1;
+        }
+
+        // Round result as requested (bulat)
+        const roundedSpine = Math.round(spine);
+
+        // Update UI
+        document.getElementById('resultValue').textContent = roundedSpine + ' mm';
+        document.getElementById('resultContainer').style.display = 'block';
+        document.getElementById('emptyState').style.display = 'none';
+
+        // Add animation effect
+        const resultBox = document.getElementById('resultValue');
+        resultBox.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            resultBox.style.transform = 'scale(1)';
+        }, 200);
+    }
+</script>
+
+<style>
+    /* Add smooth transition for result value */
+    #resultValue {
+        display: inline-block;
+        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .row-container {
+            flex-direction: column;
+        }
+
+        .card {
+            width: 100%;
+        }
+
+        #emptyState i {
+            transform: rotate(90deg);
+            /* Point up on mobile */
+        }
+    }
+</style>
+{% endblock %}

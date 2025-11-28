@@ -1,0 +1,143 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Batch Image Converter{% endblock %}
+
+{% block page_title %}Batch Image Converter{% endblock %}
+
+{% block content %}
+
+<div class="flash-messages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="flash-message {{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+<div class="responsive-grid">
+    <div class="grid-item-main">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Batch Image Converter</h3>
+                <p class="card-subtitle">Unggah banyak gambar dan konversi ke format lain.</p>
+            </div>
+            <div class="card-body">
+                <form id="convertForm">
+                    <div class="form-group">
+                        <label for="fileInput">Pilih Gambar:</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" name="image_files" class="file-input" multiple
+                                accept="image/png, image/jpeg, image/gif, image/bmp, image/webp, image/tiff">
+                            <div class="file-input-display">
+                                <span class="file-input-icon">🖼️</span>
+                                <span class="file-input-text">Klik atau drag & drop gambar di sini</span>
+                            </div>
+                        </div>
+                        <div class="file-list" id="fileList" style="display:none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pilih Format Tujuan:</label>
+                        <div class="radio-group">
+                            <input type="radio" id="fmt_jpg" name="output_format" value="JPG" checked>
+                            <label for="fmt_jpg">JPG</label>
+
+                            <input type="radio" id="fmt_png" name="output_format" value="PNG">
+                            <label for="fmt_png">PNG</label>
+
+                            <input type="radio" id="fmt_bmp" name="output_format" value="BMP">
+                            <label for="fmt_bmp">BMP</label>
+
+                            <input type="radio" id="fmt_gif" name="output_format" value="GIF">
+                            <label for="fmt_gif">GIF</label>
+
+                            <input type="radio" id="fmt_tiff" name="output_format" value="TIFF">
+                            <label for="fmt_tiff">TIFF</label>
+
+                            <input type="radio" id="fmt_webp" name="output_format" value="WEBP">
+                            <label for="fmt_webp">WEBP</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-full btn-primary" id="submitBtn">
+                        <span class="btn-text">🔄 Konversi Gambar</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="grid-item-side">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">💡 Cara Pakai</h3>
+            </div>
+            <div class="card-body">
+                <ul class="info-list">
+                    <li>Upload beberapa file gambar (JPG, PNG, dll).</li>
+                    <li>Pilih format tujuan yang Anda inginkan (misalnya WEBP).</li>
+                    <li>Klik "Konversi Gambar" dan tunggu hingga halaman hasil muncul.</li>
+                    <li>Unduh file satu per satu atau semua sekaligus dalam bentuk ZIP.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file-manager.css') }}">
+<script src="{{ url_for('static', filename='js/file-manager.js') }}"></script>
+<script>
+    const form = document.getElementById('convertForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Initialize FileManager
+    const fileManager = new FileManager('fileInput', 'fileList', 'file-input-display');
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const files = fileManager.getFiles();
+        if (files.length === 0) {
+            alert('Pilih minimal satu gambar!');
+            return;
+        }
+
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append('image_files', file);
+        });
+
+        // Get selected output format
+        const outputFormat = document.querySelector('input[name="output_format"]:checked').value;
+        formData.append('output_format', outputFormat);
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Mengonversi...';
+
+        try {
+            const response = await fetch('{{ url_for("batch_converter") }}', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                const text = await response.text();
+                alert('Konversi selesai!');
+                window.location.href = '{{ url_for("converter_results") }}';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="btn-text">🔄 Konversi Gambar</span>';
+            alert('Terjadi kesalahan saat mengonversi gambar.');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<script>
+    // ABSOLUTE FIRST PRIORITY: Set theme before ANYTHING renders
+    (function () {
+        var t = localStorage.getItem('theme') || 'dark';
+        var c = t === 'dark' ? 'dark-mode' : 'light-mode';
+        var bg = t === 'dark' ? '#0f172a' : '#f8fafc';
+        var color = t === 'dark' ? '#f1f5f9' : '#0f172a';
+        document.documentElement.className = c;
+        document.documentElement.style.background = bg;
+        document.documentElement.style.color = color;
+    })();
+</script>
+
+<head>
+    <script>
+        // ANTI-FOUC: This MUST be the absolute first thing
+        (function () {
+            var theme = localStorage.getItem('theme') || 'dark';
+            var className = theme === 'dark' ? 'dark-mode' : 'light-mode';
+            document.documentElement.className = className;
+            // Force immediate repaint
+            document.documentElement.offsetHeight;
+        })();
+    </script>
+    <style>
+        /* Critical CSS: Prevent flash by setting colors IMMEDIATELY */
+        html.light-mode {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
+        html.dark-mode {
+            background: #0f172a !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.light-mode body {
+            background-color: #F5F5F5 !important;
+            color: #212121 !important;
+        }
+
+        html.dark-mode body {
+            background-color: #212121 !important;
+            color: #F5F5F5 !important;
+        }
+
+        /* FORCE disable ALL transitions during page load */
+        html.light-mode *,
+        html.light-mode *::before,
+        html.light-mode *::after,
+        html.dark-mode *,
+        html.dark-mode *::before,
+        html.dark-mode *::after {
+            transition: none !important;
+            animation-duration: 0s !important;
+            animation-delay: 0s !important;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} - Image Processor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jobie-dashboard.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('index') }}" class="logo">
+                    <i class="fa-solid fa-bolt"></i>
+                    <h1>ImgProc</h1>
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Ekstrak Gambar</span>
+                </a>
+                <a href="{{ url_for('grayscale_extract_form') }}"
+                    class="nav-link {% if request.endpoint == 'grayscale_extract_form' %}active{% endif %}">
+                    <i class="fa-solid fa-palette"></i>
+                    <span>Ekstrak & Grayscale</span>
+                </a>
+                <a href="{{ url_for('grayscale_form') }}"
+                    class="nav-link {% if request.endpoint == 'grayscale_form' %}active{% endif %}">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Konversi Grayscale</span>
+                </a>
+                <a href="{{ url_for('document_edit') }}"
+                    class="nav-link {% if request.endpoint == 'document_edit' %}active{% endif %}">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>Hapus Gambar di Dokumen</span>
+                </a>
+                <a href="{{ url_for('spine_calculator') }}"
+                    class="nav-link {% if request.endpoint == 'spine_calculator' %}active{% endif %}">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Kalkulator Punggung Buku</span>
+                </a>
+                <a href="{{ url_for('merge_docs_route') }}"
+                    class="nav-link {% if request.endpoint == 'merge_docs_route' %}active{% endif %}">
+                    <i class="fa-solid fa-file-zipper"></i>
+                    <span>Gabung Dokumen</span>
+                </a>
+                <a href="{{ url_for('image_upscaler_form') }}"
+                    class="nav-link {% if request.endpoint == 'image_upscaler_form' %}active{% endif %}">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                    <span>Image Upscaler</span>
+                </a>
+                <a href="{{ url_for('batch_converter') }}"
+                    class="nav-link {% if request.endpoint == 'batch_converter' %}active{% endif %}">
+                    <i class="fa-solid fa-images"></i>
+                    <span>Konversi Gambar</span>
+                </a>
+            </nav>
+
+        </aside>
+
+        <div class="main-wrapper">
+            <header class="header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 class="header-title">{% block page_title %}Selamat Datang{% endblock %}</h2>
+                </div>
+
+                <div class="header-right">
+                    <div class="theme-switch-wrapper">
+                        <label class="theme-switch" for="darkModeCheckbox">
+                            <input type="checkbox" id="darkModeCheckbox" />
+                            <div class="slider round">
+                                <i class="fa-solid fa-sun"></i>
+                                <i class="fa-solid fa-moon"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Re-enable transitions after page has fully loaded
+        window.addEventListener('load', function () {
+            // Remove the transition-blocking styles
+            var style = document.createElement('style');
+            style.textContent = `
+                html.light-mode *,
+                html.dark-mode *,
+                html.light-mode *::before,
+                html.dark-mode *::before,
+                html.light-mode *::after,
+                html.dark-mode *::after {
+                    transition: initial !important;
+                    animation-duration: initial !important;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+    <script src="{{ url_for('static', filename='js/jobie-dashboard.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

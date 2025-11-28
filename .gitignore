@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+.env
+uploads/
+processed/
+files/
+static/temp_uploads/
+*.log
+backup/
+error.txt
+mod.txt
+.DS_Store
+Thumbs.db

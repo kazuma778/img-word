@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Menghitung Lebar atau Kedalaman untuk Spine / Punggung Buku | MahaMeru Calculator Tool</title>
+        <meta name="description" content="Menghitung lenar atau kedalaman untuk spine / punggung buku yang akan dicetak dengan alat MahaMeru Calculator berdasarkan ketebalan dan jumlah kertas halaman buku"/>
+        <meta charset="UTF-8"/>
+        <base href="https://www.mahameru.id/"/>
+        <meta name="format-detection" content="telephone=no"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+        <meta property="og:title" content="Menghitung Lebar atau Kedalaman untuk Spine / Punggung Buku | MahaMeru Calculator Tool"/>
+        <meta property="og:description" content="Menghitung lenar atau kedalaman untuk spine / punggung buku yang akan dicetak dengan alat MahaMeru Calculator berdasarkan ketebalan dan jumlah kertas halaman buku"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:url" content="https://www.mahameru.id/id/book-spine-calculation"/>
+        <meta property="og:site_name" content="MahaMeru"/>
+        <meta property="og:image" content="https://www.mahameru.id/image/catalog/logo.png"/>
+        <link rel="stylesheet" href="catalog/view/theme/cms/css/bootstrap.css?ver=2222">
+        <link rel="stylesheet" href="catalog/view/theme/cms/css/bp.css?ver=2222">
+        <link rel="stylesheet" href="catalog/view/theme/cms/css/responsive.css?ver=2222">
+        <script src="catalog/view/theme/cms/js/jquery.js"></script>
+        <script src=""></script>
+        <link href="https://www.mahameru.id/image/catalog/logoicon.png" rel="icon"/>
+        <script src="catalog/view/theme/cms/js/megamenu.js"></script>
+        <link rel='stylesheet' id='flat-fonts-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,400;0,500;1,400;1,500&display=swap' media='all'/>
+        <link rel="stylesheet" href="catalog/view/theme/cms/css/megamenu.css">
+    </head>
+    <body class="simple_blog-article-view ltr res layout-2  ">
+        <div id="wrapper" class="wrapper-full banners-effect-12">
+            <header id="header" class=" variant typeheader-2">
+                <div class="header-center">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 header-center-left">
+                                <div class="header-logo">
+                                    <a href="https://www.mahameru.id/">
+                                        <img src="https://www.mahameru.id/image/catalog/mahameru.png" title="MahaMeru" alt="MahaMeru"/>
+                                    </a>
+                                </div>
+                                <div class="header-search">
+                                    <div id="sosearchpro" class="sosearchpro-wrapper so-search search-pro">
+                                        <form method="GET" action="index.php">
+                                            <button id="dropdownSearch" class=" btn-search dropdown-toggle hidden-lg hidden-md hidden-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownSearch hidden-lg hidden-md hidden-xs">
+                                                <div class="form-search">
+                                                    <i class="fa fa-search"></i>
+                                                    <input class="autosearch-input form-control" type="text" value="" size="50" autocomplete="off" placeholder="pencarian produk" name="search">
+                                                    <button type="submit" class="button-search" name="submit_search">
+                                                        <span>Search</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div id="search0" class="form-search hidden-sm ">
+                                                <i class="fa fa-search"></i>
+                                                <input class="autosearch-input form-control" type="text" value="" size="50" autocomplete="off" placeholder="pencarian produk" name="search">
+                                                <button type="submit" class="button-search" name="submit_search">
+                                                    <span>Search</span>
+                                                </button>
+                                            </div>
+                                            <input type="hidden" name="route" value="product/search"/>
+                                        </form>
+                                    </div>
+                                    <script type="text/javascript">
+                                        !function(t) {
+                                            t.fn.Soautocomplete = function(e) {
+                                                return this.each(function() {
+                                                    this.timer = null,
+                                                    this.items = new Array,
+                                                    t.extend(this, e),
+                                                    t(this).attr("autocomplete", "off"),
+                                                    t(this).on("focus", function() {
+                                                        this.request()
+                                                    }),
+                                                    t(this).on("blur", function() {
+                                                        setTimeout(function(i) {
+                                                            i.hide()
+                                                        }, 200, this)
+                                                    }),
+                                                    t(this).on("keydown", function(i) {
+                                                        switch (i.keyCode) {
+                                                        case 27:
+                                                            this.hide();
+                                                            break;
+                                                        default:
+                                                            this.request()
+                                                        }
+                                                    }),
+                                                    this.click = function(i) {
+                                                        i.preventDefault(),
+                                                        value = t(i.target).parent().attr("data-value"),
+                                                        value && this.items[value] && this.select(this.items[value])
+                                                    }
+                                                    ,
+                                                    this.show = function() {
+                                                        var i = t(this).position();
+                                                        t(this).siblings("ul.dropdown-menu").css({
+                                                            top: i.top + t(this).outerHeight(),
+                                                            left: i.left
+                                                        }),
+                                                        t(this).siblings("ul.dropdown-menu").show()
+                                                    }
+                                                    ,
+                                                    this.hide = function() {
+                                                        t(this).siblings("ul.dropdown-menu").hide()
+                                                    }
+                                                    ,
+                                                    this.request = function() {
+                                                        clearTimeout(this.timer),
+                                                        this.timer = setTimeout(function(i) {
+                                                            i.source(t(i).val(), t.proxy(i.response, i))
+                                                        }, 200, this)
+                                                    }
+                                                    ,
+                                                    this.response = function(e) {
+                                                        if (html = "",
+                                                        e.length) {
+                                                            for (i = 0; i < e.length; i++)
+                                                                this.items[e[i].value] = e[i];
+                                                            for (i = 0; i < e.length; i++)
+                                                                e[i].category || (html += '<li class="media" data-value="' + e[i].value + '" title="' + e[i].label + '">',
+                                                                e[i].image && e[i].show_image && 1 == e[i].show_image && (html += '	<a class="media-left" href="' + e[i].link + '"><img class="pull-left" src="' + e[i].image + '"></a>'),
+                                                                html += '<div class="media-body">',
+                                                                html += '<a href="' + e[i].link + '" title="' + e[i].label + '"><span>' + e[i].cate_name + e[i].label + "</span></a>",
+                                                                e[i].price && e[i].show_price && 1 == e[i].show_price && (html += '	<div class="price" style="clear: both;"> ',
+                                                                e[i].special ? html += '<span class="price-old">' + e[i].price + '</span><span class="price-new">' + e[i].special + "</span>" : html += '<span class="price">' + e[i].price + "</span>",
+                                                                e[i].tax && (html += '<span class="price-tax hidden">text_tax : ' + e[i].tax + "</span>"),
+                                                                html += "	</div>"),
+                                                                html += "</div></li>",
+                                                                html += '<li class="clearfix"></li>');
+                                                            var s = new Array;
+                                                            for (i = 0; i < e.length; i++)
+                                                                e[i].category && (s[e[i].category] || (s[e[i].category] = new Array,
+                                                                s[e[i].category].name = e[i].category,
+                                                                s[e[i].category].item = new Array),
+                                                                s[e[i].category].item.push(e[i]));
+                                                            for (i in s)
+                                                                for (html += '<li class="dropdown-header">' + s[i].name + "</li>",
+                                                                j = 0; j < s[i].item.length; j++)
+                                                                    html += '<li data-value="' + s[i].item[j].value + '"><a href="#">&nbsp;&nbsp;&nbsp;' + s[i].item[j].label + "</a></li>"
+                                                        }
+                                                        html ? this.show() : this.hide(),
+                                                        t(this).siblings("ul.dropdown-menu").html(html)
+                                                    }
+                                                    ,
+                                                    t(this).after('<ul class="dropdown-menu"></ul>')
+                                                })
+                                            }
+                                        }(window.jQuery);
+                                        $(document).ready(function() {
+                                            var selector = '#search0';
+                                            var total = 0;
+                                            var showimage = 1;
+                                            var showprice = 1;
+                                            var character = 1;
+                                            var height = 60;
+                                            var width = 60;
+                                            $(selector).find('input[name=\'search\']').Soautocomplete({
+                                                delay: 500,
+                                                source: function(request, response) {
+                                                    var category_id = $(".select_category select[name=\"category_id\"]").first().val();
+                                                    if (typeof (category_id) == 'undefined')
+                                                        category_id = 0;
+                                                    var limit = 5;
+                                                    if (request.length >= character) {
+                                                        $.ajax({
+                                                            url: 'index.php?route=extension/module/so_searchpro/autocomplete&filter_category_id=' + category_id + '&limit=' + limit + '&width=' + width + '&height=' + height + '&filter_name=' + encodeURIComponent(request),
+                                                            dataType: 'json',
+                                                            success: function(json) {
+                                                                response($.map(json, function(item) {
+                                                                    total = 0;
+                                                                    if (item.total) {
+                                                                        total = item.total;
+                                                                    }
+                                                                    return {
+                                                                        price: item.price,
+                                                                        special: item.special,
+                                                                        tax: item.tax,
+                                                                        label: item.name,
+                                                                        cate_name: (item.category_name) ? item.category_name + ' > ' : '',
+                                                                        image: item.image,
+                                                                        link: item.link,
+                                                                        minimum: item.minimum,
+                                                                        show_price: showprice,
+                                                                        show_image: showimage,
+                                                                        value: item.product_id,
+                                                                    }
+                                                                }));
+                                                            }
+                                                        });
+                                                    }
+                                                },
+                                            });
+                                        });
+                                    </script>
+                                    <div class="module html-shipping">
+                                        <div class="shipping">
+                                            <i class="fa fa-truck"></i>
+                                            <div class="inner">
+                                                <p class="font-fur2">KIRIM SELURUH INDONESIA</p>
+                                                Pengiriman keseluruh Indonesia
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="header-cart">
+                                    <div class="shopping_cart pull-right">
+                                        <div id="cart" class="btn-shopping-cart">
+                                            <a class="top_cart dropdown-toggle" data-toggle="dropdown">
+                                                <div class="shopcart">
+                                                    <i class="fa fa-shopping-cart"></i>
+                                                    <p class="title">My cart</p>
+                                                    <span class="text-shopping-cart cart-total-full"></span>
+                                                </div>
+                                            </a>
+                                            <ul class="tab-content content dropdown-menu pull-right shoppingcart-box" role="menu">
+                                                <li>
+                                                    <p class="text-center empty" style="font-weight:300; padding-top: 20px;">Kosong</p>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-bottom">
+                    <div id="headersticky" class="container">
+                        <div class="header-navigation">
+                            <div class="responsive megamenu-style-dev">
+                                <nav class="navbar-default">
+                                    <div class=" container-megamenu  horizontal">
+                                        <div class="navbar-header">
+                                            <button type="button" id="show-megamenu" data-toggle="collapse" class="navbar-toggle">
+                                                <span class="icon-bar"></span>
+                                                <span class="icon-bar"></span>
+                                                <span class="icon-bar"></span>
+                                            </button>
+                                        </div>
+                                        <div class="megamenu-wrapper">
+                                            <span id="remove-megamenu" class="fa fa-times"></span>
+                                            <div class="megamenu-pattern">
+                                                <div class="container">
+                                                    <ul class="megamenu" data-transition="fade" data-animationtime="250">
+                                                        <li class="home">
+                                                            <a href="https://www.mahameru.id/">
+                                                                <i class="fa fa-home"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li class='feafure menu-ip with-sub-menu hover'>
+                                                            <p class='close-menu'></p>
+                                                            <a href='javascript:void()' class='clearfix'>
+                                                                <strong>Produk	</strong>
+                                                                <b class='caret'></b>
+                                                            </a>
+                                                            <div class="sub-menu" style="width:80%">
+                                                                <div class="content">
+                                                                    <div class="row">
+                                                                        <div class="col-sm-12">
+                                                                            <div class="categories feafure-dr">
+                                                                                <div class="row">
+                                                                                    <div class="col-sm-4 hover-menu">
+                                                                                        <div class="menu">
+                                                                                            <ul>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/spanduk-banner" onclick="window.location = 'https://www.mahameru.id/spanduk-banner';" class="main-menu">Spanduk - Banner</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/brosur-selebaran" onclick="window.location = 'https://www.mahameru.id/brosur-selebaran';" class="main-menu">Flyer - Brosur</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/cetak-buku-form-ncr" onclick="window.location = 'https://www.mahameru.id/cetak-buku-form-ncr';" class="main-menu">Buku Form NCR</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/buku-booklet-majalah-tabloid" onclick="window.location = 'https://www.mahameru.id/buku-booklet-majalah-tabloid';" class="main-menu">Buku Kustom</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/poster-pajangan" onclick="window.location = 'https://www.mahameru.id/poster-pajangan';" class="main-menu">Poster - Pajangan</a>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-sm-4 hover-menu">
+                                                                                        <div class="menu">
+                                                                                            <ul>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/cetak-kartu" onclick="window.location = 'https://www.mahameru.id/cetak-kartu';" class="main-menu">Janis Kartu</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/cetak-dokumen" onclick="window.location = 'https://www.mahameru.id/cetak-dokumen';" class="main-menu">Dokumen</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/cetak-stiker" onclick="window.location = 'https://www.mahameru.id/cetak-stiker';" class="main-menu">Sticker</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/kalender" onclick="window.location = 'https://www.mahameru.id/kalender';" class="main-menu">Kalender</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/print-merchandise" onclick="window.location = 'https://www.mahameru.id/print-merchandise';" class="main-menu">Merchandise</a>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-sm-4 hover-menu">
+                                                                                        <div class="menu">
+                                                                                            <ul>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/cetak-kain-tekstil" onclick="window.location = 'https://www.mahameru.id/cetak-kain-tekstil';" class="main-menu">Kain Textile</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/cetak-photo-panel-art-canvas-dinding" onclick="window.location = 'https://www.mahameru.id/cetak-photo-panel-art-canvas-dinding';" class="main-menu">Panel Art Canvas</a>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <a href="https://www.mahameru.id/produk-cetakan" onclick="window.location = 'https://www.mahameru.id/produk-cetakan';" class="main-menu">Produk Lainnya</a>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li class='feafure menu-ip with-sub-menu hover'>
+                                                            <p class='close-menu'></p>
+                                                            <a href='javascript:void()' class='clearfix'>
+                                                                <strong>Inside	</strong>
+                                                                <b class='caret'></b>
+                                                            </a>
+                                                            <div class="sub-menu" style="width:25%">
+                                                                <div class="content">
+                                                                    <div class="row">
+                                                                        <div class="col-sm-12">
+                                                                            <div class="html ">
+                                                                                <div class="hover-menu">
+                                                                                    <div class="menu">
+                                                                                        <ul>
+                                                                                            <li>
+                                                                                                <a href="printing-guide" class="main-menu">REFERENSI &amp;PANDUAN</a>
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                <a href="application-tool" class="main-menu">ALAT - APLIKASI</a>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </nav>
+                            </div>
+                            <div class="module html-social html-custom">
+                                <div class="socials-header">
+                                    <div class="socials-wrap hidden-lg hidden-md">
+                                        <ul>
+                                            <li class="li-social facebook-social">
+                                                <a rel="nofollow" title="Phone" href="tel:+623614746146" target="_blank">
+                                                    <span class="fa fa-fax icon-social"></span>
+                                                </a>
+                                            </li>
+                                            <li class="li-social twitter-social">
+                                                <a rel="nofollow" title="Whatsapp" href="https://api.whatsapp.com/send?phone=6285738224455" target="_blank">
+                                                    <span style="font-size:18px" class="fa fa-whatsapp icon-social"></span>
+                                                </a>
+                                            </li>
+                                            <li class="li-social google-social">
+                                                <a title="Email" href="id/kontak">
+                                                    <span class="fa fa-envelope-o icon-social"></span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <a class="hidden-xs hidden-sm" title="Hubungi Kami" href="kontak">KONTAK</a>
+                                </div>
+                            </div>
+                            <div class="rltop">
+                                <div class="form-group currencies-block">
+                                    <form action="https://www.mahameru.id/index.php?route=common/currency/currency" method="post" enctype="multipart/form-data" id="form-currency">
+                                        <a class="btn btn-link dropdown-toggle" data-toggle="dropdown">
+                                            <span class="mycur">Rp </span>
+                                            <i class="fa fa-caret-down"></i>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="currency-select btn-block" type="button" name="AUD">Australian Dollar</button>
+                                            </li>
+                                            <li>
+                                                <button class="currency-select btn-block" type="button" name="EUR">European Union</button>
+                                            </li>
+                                            <li>
+                                                <button class="currency-select btn-block" type="button" name="IDR">Indonesian Rupiah</button>
+                                            </li>
+                                            <li>
+                                                <button class="currency-select btn-block" type="button" name="GBP">Pound Sterling</button>
+                                            </li>
+                                            <li>
+                                                <button class="currency-select btn-block" type="button" name="USD">United State Dollar</button>
+                                            </li>
+                                        </ul>
+                                        <input type="hidden" name="code" value=""/>
+                                        <input type="hidden" name="redirect" value="https://www.mahameru.id/book-spine-calculation"/>
+                                    </form>
+                                </div>
+                                <div class="form-group languages-block">
+                                    <form action="https://www.mahameru.id/index.php?route=common/language/language" method="post" enctype="multipart/form-data" id="form-language">
+                                        <a class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            <img src="catalog/language/id/id.png" alt="Indonesia" title="Indonesia">
+                                            <span class="fa fa-caret-down"></span>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="btn-block language-select" type="button" name="id">
+                                                    <img src="catalog/language/id/id.png" alt="Indonesia" title="Indonesia"/>Indonesia
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="btn-block language-select" type="button" name="en">
+                                                    <img src="catalog/language/en/en.png" alt="English" title="English"/>English
+                                                </button>
+                                            </li>
+                                        </ul>
+                                        <input type="hidden" name="code" value=""/>
+                                        <input type="hidden" name="redirect" value=""/>
+                                    </form>
+                                </div>
+                                <div id="useracc" class="form-group">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        <i class="fa fa-user"></i>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a rel="nofollow" href="https://www.mahameru.id/register">Daftar</a>
+                                        </li>
+                                        <li>
+                                            <a rel="nofollow" href="https://www.mahameru.id/login">Login</a>
+                                        </li>
+                                        <li>
+                                            <a rel="nofollow" href="https://www.mahameru.id/tracking">Tracking</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="container wide">
+                <div class="row">
+                    <div id="content">
+                        <div class="col-sm-8 col-xs-12 wides">
+                            <div class="article-info">
+                                <h1>
+                                    <strong>Kalkulasi Spine Buku</strong>
+                                </h1>
+                                <div class="article-description">
+                                    <link rel="stylesheet" href="tool/custom.css">
+                                    <link rel="stylesheet" href="tool/spine.css">
+                                    <script src="tool/spine.js"></script>
+                                    <div class="row left">
+                                        <div class="col-md-3 col-sm-4 col-xs-4">
+                                            <div id="total"></div>
+                                        </div>
+                                        <div class="col-md-9 col-sm-8 col-xs-8 right">
+                                            <!-- start -->
+                                            <div class="col-md-3 col-sm-12 col-xs-12">
+                                                <!-- 1 -->
+                                                <div class="form-group custom-select">
+                                                    <label class="control-label">Berat Kertas</label>
+                                                    <select name="paperweight" id="paperweight">
+                                                        <option value="">&nbsp;-</option>
+                                                        <option value="60">&nbsp;&nbsp;60 gsm</option>
+                                                        <option value="70">&nbsp;&nbsp;70 gsm</option>
+                                                        <option value="80">&nbsp;&nbsp;80 gsm</option>
+                                                        <option value="85">&nbsp;&nbsp;85 gsm</option>
+                                                        <option value="100">100 gsm</option>
+                                                        <option value="120">120 gsm</option>
+                                                        <option value="150">150 gsm</option>
+                                                        <option value="190">190 gsm</option>
+                                                        <option value="210">210 gsm</option>
+                                                    </select>
+                                                </div>
+                                                <!-- 2 -->
+                                                <div class="form-group custom-select">
+                                                    <label class="control-label">Jenis Kertas</label>
+                                                    <select name="papervolume" id="papervolume">
+                                                        <option value="">&nbsp;-</option>
+                                                        <option value="12.5">Uncoated / HVS</option>
+                                                        <option value="8">Coated / Artpaper</option>
+                                                        <option value="9">Matte / Artpaper</option>
+                                                        <option value="18">Book paper</option>
+                                                    </select>
+                                                </div>
+                                                <!-- 3 -->
+                                                <div class="form-group custom-select">
+                                                    <label class="control-label">Cover</label>
+                                                    <select name="cover" id="cover">
+                                                        <option value="">&nbsp;-</option>
+                                                        <option value="1">Softcover / Paperback</option>
+                                                        <option value="6">Hardcover / Hardback</option>
+                                                    </select>
+                                                </div>
+                                                <!-- 4 -->
+                                                <br>
+                                                <div class="form-group" style="width:235px">
+                                                    <label class="control-label">Jumlah Halaman</label>
+                                                    <div class="input-group nomor" style="margin:-2px 0 0 0">
+                                                        <input style="width:170px" min="1" max="600" type="number" name="pgextent" id="pgextent" value="1">
+                                                        <span class="input-group-addon">pages</span>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <br>
+                                                <div class="form-group">
+                                                    <input style="width:235px" id="calculate" type="submit" class="btn btn-info btn-lg" value="Calculate">
+                                                </div>
+                                                <br>
+                                            </div>
+                                            <!---- -->
+                                            <div class="col-md-9 col-sm-12 col-xs-12 widgetkanan">
+                                                <h2>Apakah itu Spine buku?</h2>
+                                                Spine dari buku mengacu pada tepi luar buku di mana halaman dikumpulkan dan dilakukan penjilidan.
+<br>
+                                                <br>
+                                                Selain memberikan anchor point untuk halaman, belakang buku yang dilem memungkinkan sampul buku dan halaman untuk dibuka dan ditutup dengan mudah.
+<br>
+                                                <br>
+                                                <h3>Mencetak pada Spine buku</h3>
+                                                <img src="image/spine.jpg" style="float: left; margin-right: 15px">
+                                                Jenis buku softcover dan hardcover yang telah umum dicetak dengan spine ditentukan dari jumlah halaman dan ketebalan kertas yang dipakai. Hal ini yang menentukan lebar tulang belakang buku. 
+<br>
+                                                <br>Semakin lebar tulang belakang, maka semakin lebar spine karena buku akan semakin tebal. Spine yang lebar akan semakin banyak area untuk bisa dicetak pada spine. Mencetak judul dan fitur lainnya di tulang belakang buku memungkinkan buku untuk diidentifikasi saat berdiri secara vertikal di rak pajangan atau pada secara horisontal saat ditempatkan pada tumpukan banayak buku.
+
+                                            </div>
+                                            <!---- -->
+                                        </div>
+                                        <!-- end -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-xs-12 articlewidget"></div>
+                    </div>
+                </div>
+            </div>
+            <footer id="footer" class="footer typefooter-1">
+                <div class="footer-container">
+                    <section class="footer-navbar ">
+                        <div class="container">
+                            <div class="footer-center">
+                                <div class="row">
+                                    <div class="col-sm-5 col-xs-12 block-ip box-extra">
+                                        <div class="module clearfix">
+                                            <h3 class="footer-title">MahaMeru Bali</h3>
+                                            <div class="modcontent">
+                                                <br>Percetakan MahaMeru menawarkan cetakan dengan offset warna dan digital fullcolor printing untuk hasil yang berkwalitas untuk cetakan indoor - outdoor anda. Kami mengerjakan berbagai jenis cetakan untuk keperluan media promosi perusahaan, acara event, meeting, dekorasi, konferensi, perlengkapan alat tulis kantor, dsb
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3 col-xs-12 block-ip box-information">
+                                        <div class="module clearfix">
+                                            <h3 class="footer-title">Informasi</h3>
+                                            <div class="modcontent block-content">
+                                                <ul class="menu">
+                                                    <li>
+                                                        <a href="https://www.mahameru.id/tentang-kami">Tentang Kami </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="https://www.mahameru.id/file-digital">Pengiriman Desain File </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="https://www.mahameru.id/ketentuan-aturan-order">Aturan dan Ketentuan </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-4 col-xs-12 block-ip collapsed-block custom-about">
+                                        <div class="clearfix inner">
+                                            <div class="modcontent">
+                                                <div class="footer-contact">
+                                                    <span class="footer-title">Alamat</span>
+                                                    <div class="footer-contact-content block-content">
+                                                        <p class="address">
+                                                            <i class="fa fa-map-marker"></i>
+                                                            <a target="_blank" href="https://g.page/mahameru-bali">
+                                                                <span>
+                                                                    &nbsp;Jl. Kaswari No. 8A<br/>Denpasar, Bali, Indonesia
+                                                                </span>
+                                                            </a>
+                                                        </p>
+                                                        <p class="phone">
+                                                            <i class="fa fa-whatsapp"></i>
+                                                            <a target="_blank" rel="nofollow" href="https://api.whatsapp.com/send?phone=6285738224455">
+                                                                <span>+6285738224455</span>
+                                                            </a>
+                                                        </p>
+                                                        <p class="email">
+                                                            <i class="fa fa-envelope-o"></i>
+                                                            <a rel="nofollow" title="Email Us">
+                                                                <span>cs@mahameru.net</span>
+                                                            </a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer-bottom">
+                            <div class="container">
+                                <div class="col-sm-5 col-xs-12 payment">
+                                    <img src="https://www.mahameru.id/image/payment.png" alt="Accept Payment Credit Card, Debit and Bank Transfer for Printing Order">
+                                </div>
+                                <div class="col-sm-7 col-xs-12 copyright-text">
+                                    © 2025 <a href="https://www.baliprintshop.com" title="Bali Print Shop">Bali Print</a>
+                                    by <a href="https://www.mahamerubali.com" title="Bali Printing, Percetakan di Bali">MahaMeru</a>
+                                    | <a href="https://www.balipublisher.com" title="Penerbit Buku Bali">Penerbit Buku</a>
+                                    | <a href="https://www.komangputra.com" title="Blogger Bali, Adat dan Budaya Bali">Blogger Bali</a>
+                                    |  <a href="https://www.baliprintshop.com" title="Printing Shop in Bali">Print Shop</a>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </footer>
+            <div class="back-to-top">
+                <i class="fa fa-angle-up"></i>
+            </div>
+            <script src="catalog/view/theme/cms/js/bootstrap.js?ver=2222"></script>
+            <script src="catalog/view/theme/cms/js/libs.js?ver=2222"></script>
+            <script src="catalog/view/theme/cms/js/common.js?ver=2222"></script>
+            <link rel="stylesheet" href="catalog/view/theme/cms/css/font-awesome.css?ver=2222">
+            <script src="catalog/view/theme/cms/js/cmsfooter.js?ver=2222"></script>
+        </div>
+    </body>
+</html>

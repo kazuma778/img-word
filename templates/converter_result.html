@@ -1,0 +1,58 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Conversion Results{% endblock %}
+
+{% block page_title %}Conversion Results{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        {% if converted_files %}
+        <h3 class="card-title">✅ Konversi Berhasil!</h3>
+        <p class="card-subtitle">File Anda telah dikonversi dan siap diunduh.</p>
+
+        <ul class="result-list">
+            {% for file in converted_files %}
+            <li class="file-item">
+                <span>🖼️ {{ file }}</span>
+                <a href="{{ url_for('download_converted_file', filename=file) }}" class="btn btn-secondary">Download</a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ zip_url }}" class="btn btn-full btn-primary" style="margin-top: 1.5rem;">💾 Download
+            Semua sebagai ZIP</a>
+        {% else %}
+        <h3 class="card-title">❌ Gagal Konversi</h3>
+        <p class="card-subtitle">Tidak ada file yang dikonversi. Silakan coba lagi.</p>
+        {% endif %}
+
+        <a href="{{ back_url }}" class="btn btn-full"
+            style="margin-top: 1.5rem; background-color: var(--text-color-light);">{{ back_text }}</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .result-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 1.5rem;
+    }
+
+    .result-list .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: var(--bg-color);
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+    }
+
+    .result-list .file-item span {
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

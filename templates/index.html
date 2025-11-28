@@ -1,0 +1,178 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Ekstraksi Gambar{% endblock %}
+
+{% block page_title %}Ekstraksi Gambar{% endblock %}
+
+{% block content %}
+
+{# Metric Cards #}
+<div class="metric-grid">
+    <div class="card metric-card">
+        <div class="card-body">
+            <i class="fa-solid fa-file-pdf icon-metric icon-pdf"></i>
+            <div class="metric-content">
+                <h3>PDF</h3>
+                <p>Ekstrak dari file PDF</p>
+            </div>
+        </div>
+    </div>
+    <div class="card metric-card">
+        <div class="card-body">
+            <i class="fa-solid fa-file-word icon-metric icon-doc"></i>
+            <div class="metric-content">
+                <h3>DOC/DOCX</h3>
+                <p>Ekstrak dari file Word</p>
+            </div>
+        </div>
+    </div>
+    <div class="card metric-card">
+        <div class="card-body">
+            <i class="fa-solid fa-file-alt icon-metric icon-rtf"></i>
+            <div class="metric-content">
+                <h3>RTF</h3>
+                <p>Ekstrak dari file RTF</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Main Extraction Card #}
+<div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h3 class="card-title">Ekstrak Gambar Dari Dokumen</h3>
+        <p class="card-subtitle">Pilih file PDF, DOC, DOCX, atau RTF untuk diekstrak gambarnya.</p>
+    </div>
+    <div class="card-body">
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message error">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <form id="extractForm">
+            <div class="form-group">
+                <label for="fileInput">Pilih File:</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" name="file" class="file-input" multiple accept=".pdf,.doc,.docx,.rtf">
+                    <div class="file-input-display">
+                        <span class="file-input-icon">📁</span>
+                        <span class="file-input-text">Klik atau drag & drop file di sini</span>
+                    </div>
+                </div>
+                <div class="file-list" id="fileList" style="display: none;"></div>
+            </div>
+
+            <button type="submit" class="btn btn-full btn-primary" id="submitBtn">
+                <span class="btn-text">🚀 Mulai Ekstraksi</span>
+            </button>
+        </form>
+
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-text" id="progressText">Memproses...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-message" id="progressMessage">Mempersiapkan...</div>
+        </div>
+
+        <div class="download-section" id="downloadSection" style="display: none;">
+            <h3>✅ Ekstraksi Berhasil!</h3>
+            <p>File gambar telah diekstrak dan siap diunduh.</p>
+            <a href="#" id="downloadBtn" class="btn btn-secondary">💾 Download ZIP</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file-manager.css') }}">
+<script src="{{ url_for('static', filename='js/file-manager.js') }}"></script>
+<script>
+    const form = document.getElementById('extractForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const downloadSection = document.getElementById('downloadSection');
+
+    // Initialize FileManager
+    const fileManager = new FileManager('fileInput', 'fileList', 'file-input-display');
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const files = fileManager.getFiles();
+        if (files.length === 0) {
+            alert('Pilih file terlebih dahulu!');
+            return;
+        }
+
+        const formData = new FormData();
+        files.forEach(file => {
+            formData.append('file', file);
+        });
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Memproses...';
+        progressContainer.style.display = 'block';
+        downloadSection.style.display = 'none';
+
+        try {
+            const response = await fetch('/extract-start', {
+                method: 'POST',
+                body: formData
+            });
+
+            const taskId = await response.text();
+            trackProgress(taskId);
+        } catch (error) {
+            console.error('Error:', error);
+            resetForm();
+            alert('Terjadi kesalahan saat memproses file.');
+        }
+    });
+
+    function trackProgress(taskId) {
+        const interval = setInterval(async () => {
+            try {
+                const response = await fetch(`/processing-progress/${taskId}`);
+                const data = await response.json();
+
+                document.getElementById('progressFill').style.width = data.progress + '%';
+                document.getElementById('progressText').textContent = `Progress: ${Math.round(data.progress)}%`;
+                document.getElementById('progressMessage').textContent = data.message || 'Memproses...';
+
+                if (data.status === 'completed') {
+                    clearInterval(interval);
+                    showDownload(data.download_url);
+                } else if (data.status === 'failed') {
+                    clearInterval(interval);
+                    alert('Proses gagal: ' + data.message);
+                    resetForm();
+                }
+            } catch (error) {
+                clearInterval(interval);
+                console.error('Error tracking progress:', error);
+                resetForm();
+            }
+        }, 1000);
+    }
+
+    function showDownload(downloadUrl) {
+        progressContainer.style.display = 'none';
+        downloadSection.style.display = 'block';
+        document.getElementById('downloadBtn').href = downloadUrl;
+        resetForm();
+    }
+
+    function resetForm() {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="btn-text">🚀 Mulai Ekstraksi</span>';
+    }
+</script>
+{% endblock %}

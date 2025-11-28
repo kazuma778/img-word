@@ -1,0 +1,161 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Image Upscaler{% endblock %}
+
+{% block page_title %}Image Upscaler (via ImgUpscaler AI){% endblock %}
+
+{% block content %}
+<div class="responsive-grid">
+    <div class="grid-item-main">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Image Upscaler</h3>
+                <p class="card-subtitle">Pilih gambar dan salah satu operasi untuk memulai.</p>
+            </div>
+            <div class="card-body">
+                <form id="imageEditForm">
+                    <!-- Image Upload -->
+                    <div class="form-group">
+                        <label for="imageInput">Pilih File Gambar (JPG, PNG):</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="imageInput" name="image" class="file-input" accept=".jpg,.jpeg,.png">
+                            <div class="file-input-display" id="fileDisplay">
+                                <span class="file-input-icon">🖼️</span>
+                                <span class="file-input-text">Klik atau drag & drop gambar di sini</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <button type="submit" class="btn btn-full" id="submitBtn">
+                        <span class="btn-text">✨ Proses Gambar</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-item-side">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Hasil</h3>
+            </div>
+            <div class="card-body result-container" id="resultContainer">
+                <div id="loadingSpinner" class="spinner-wrapper" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>Memproses gambar...</p>
+                </div>
+                <div id="resultPlaceholder">
+                    <p>Hasil gambar akan ditampilkan di sini.</p>
+                </div>
+                <img id="resultImage" src="" alt="Hasil Gambar" style="display: none; max-width: 100%; border-radius: 8px;">
+                <div class="button-group" style="margin-top: 1rem; display: flex; gap: 10px;">
+                    <a id="downloadLink" href="#" class="btn btn-secondary" style="display: none;" download="result.png">💾 Download Hasil</a>
+                    <button id="cancelBtn" class="btn btn-danger" style="display: none;">Batalkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const form = document.getElementById('imageEditForm');
+    const imageInput = document.getElementById('imageInput');
+    const fileDisplay = document.getElementById('fileDisplay');
+    const submitBtn = document.getElementById('submitBtn');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultPlaceholder = document.getElementById('resultPlaceholder');
+    const resultImage = document.getElementById('resultImage');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const downloadLink = document.getElementById('downloadLink');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    let abortController;
+
+    // File input preview
+    imageInput.addEventListener('change', () => {
+        const file = imageInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                fileDisplay.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 150px; border-radius: 8px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Cancel button logic
+    cancelBtn.addEventListener('click', () => {
+        if (abortController) {
+            abortController.abort();
+        }
+    });
+
+    // Form submission logic
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!imageInput.files[0]) {
+            alert('Silakan pilih gambar terlebih dahulu.');
+            return;
+        }
+
+        abortController = new AbortController();
+        const signal = abortController.signal;
+
+        const formData = new FormData();
+        formData.append('image', imageInput.files[0]);
+        formData.append('operation', 'upscale');
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Memproses...';
+        loadingSpinner.style.display = 'flex';
+        resultPlaceholder.style.display = 'none';
+        resultImage.style.display = 'none';
+        downloadLink.style.display = 'none';
+        cancelBtn.style.display = 'inline-flex';
+
+        try {
+            const response = await fetch('/process-image', {
+                method: 'POST',
+                body: formData,
+                signal: signal
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const imageUrl = data.image_url;
+                resultImage.src = imageUrl;
+                resultImage.style.display = 'block';
+                downloadLink.href = imageUrl;
+                downloadLink.style.display = 'flex';
+            } else {
+                alert('Error: ' + data.message);
+                resultPlaceholder.style.display = 'block';
+            }
+
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log('Fetch aborted by user.');
+                resultPlaceholder.textContent = 'Proses dibatalkan oleh pengguna.';
+                resultPlaceholder.style.display = 'block';
+            } else {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan yang tidak terduga.');
+                resultPlaceholder.style.display = 'block';
+            }
+        } finally {
+            // Reset button and hide spinner/cancel button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="btn-text">✨ Proses Gambar</span>';
+            loadingSpinner.style.display = 'none';
+            cancelBtn.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

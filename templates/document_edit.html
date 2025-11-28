@@ -1,0 +1,112 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Hapus Gambar di Dokumen{% endblock %}
+
+{% block page_title %}Hapus Gambar di Dokumen{% endblock %}
+
+{% block content %}
+
+<div class="responsive-grid">
+    <div class="grid-item">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Hapus Gambar di Dokumen DOC/DOCX/RTF</h3>
+                <p class="card-subtitle">Hapus gambar dan ubah font ke Arial pada file DOC/DOCX/RTF.</p>
+            </div>
+            <div class="card-body">
+                <div class="flash-messages">
+                    {% with messages = get_flashed_messages(category_filter=["error"]) %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="flash-message error">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" id="documentForm">
+                    <div class="form-group">
+                        <label for="fileInput">Pilih File DOC/DOCX/RTF:</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" name="file" class="file-input" multiple
+                                accept=".doc,.docx,.rtf">
+                            <div class="file-input-display">
+                                <span class="file-input-icon">📄</span>
+                                <span class="file-input-text">Klik atau drag & drop file di sini</span>
+                            </div>
+                        </div>
+                        <div class="file-list" id="fileList" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <p class="info-box">
+                            <strong>🔧 Fitur Edit Dokumen:</strong><br>
+                            • Mendukung format: DOC, DOCX, RTF<br>
+                            • Konversi otomatis DOC dan RTF ke DOCX<br>
+                            • Menghapus semua gambar dari dokumen<br>
+                            • Mengubah font menjadi Arial 12pt
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-full" id="submitBtn">
+                        <span class="btn-text">🔧 Mulai Edit Dokumen</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-item">
+        {% if processed %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">✅ Dokumen Berhasil Diedit!</h3>
+                <p class="card-subtitle">File dokumen telah diproses dan siap diunduh.</p>
+            </div>
+            <div class="card-body">
+                {% for filename in filenames %}
+                <div class="file-download-item">
+                    <span class="file-name">📄 {{ filename }}</span>
+                    <a href="{{ url_for('download_doc', filename=filename) }}" class="btn btn-secondary">💾 Download</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file-manager.css') }}">
+<script src="{{ url_for('static', filename='js/file-manager.js') }}"></script>
+<script>
+    const form = document.getElementById('documentForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Initialize FileManager
+    const fileManager = new FileManager('fileInput', 'fileList', 'file-input-display');
+
+    console.log('FileManager initialized:', fileManager);
+
+    // Form submission handling
+    form.addEventListener('submit', function (e) {
+        const files = fileManager.getFiles();
+        console.log('Form submitted, files:', files);
+
+        if (files.length === 0) {
+            e.preventDefault();
+            alert('Pilih file DOC, DOCX, atau RTF terlebih dahulu!');
+            return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading-spinner"></span> Mengedit Dokumen...';
+
+        // Form will submit normally via POST
+        console.log('Submitting form with', files.length, 'file(s)');
+    });
+</script>
+{% endblock %}
