@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/printmat/virtualenv/e/files
+    - export DEPLOYPATH=/home/printmat/printmate.my.id/ipul
     - /bin/cp -R * $DEPLOYPATH
     - /bin/cp .env $DEPLOYPATH
     # Optional: Install dependencies automatically (uncomment if needed)
