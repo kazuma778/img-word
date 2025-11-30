@@ -1510,7 +1510,7 @@ def merge_docs_route():
             if change_font:
                 change_font_times_new_roman(out_path)
 
-            download_url = url_for('download_file', filename=out_name)
+            download_url = url_for('download_converted_file', filename=out_name)
             flash(Markup(
                 "✅ Dokumen berhasil digabung!<br><br>"
                 f"<a href='{download_url}' class='btn'>💾 Download di sini</a>"
@@ -1562,7 +1562,7 @@ def process_image():
                             # Cleanup temporary uploaded file
                             safe_remove_file(temp_input_path)
                             # Return the URL to the processed image
-                            return jsonify({'success': True, 'image_url': url_for('download_file', filename=output_filename)}), 200
+                            return jsonify({'success': True, 'image_url': url_for('download_converted_file', filename=output_filename)}), 200
                         else:
                             safe_remove_file(temp_input_path)
                             return jsonify({'success': False, 'message': 'Failed to download upscaled image'}), 500
